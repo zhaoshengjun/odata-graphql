@@ -2,7 +2,6 @@
 const createXMLNode = require('./xml').createXMLNode;
 
 const normalized = name => name;
-
 const regex = new RegExp(/(\S*\=\"[^\"]*\")|(\S*)/, 'g');
 
 /**
@@ -16,28 +15,7 @@ const parse = chunk => {
 	let attributes = [];
 	// definition node
 	if (cleanChunk.startsWith('<?') && cleanChunk.endsWith('?>')) {
-		cleanChunk = cleanChunk.replace('<?', '').replace('?>', '');
-		// definition node
-		let groups = cleanChunk.match(regex).filter(data => data.length > 1);
-		groups.forEach(group => {
-			if (group.includes('=')) {
-				attributes.push({
-					name: group.split('=')[0],
-					value: group.split('=')[1].replace(/\"/g, '')
-				});
-			} else {
-				name = group;
-			}
-		});
-		node = createXMLNode({
-			type: 'XMLDefinition',
-			name: normalized(name),
-			value: chunk,
-			selfClosing: true,
-			attributes,
-			children: []
-		});
-		return node;
+		return parseXMLDefinitionNode(cleanChunk);
 	}
 	// close a node
 	if (cleanChunk.startsWith('</')) {
@@ -45,35 +23,65 @@ const parse = chunk => {
 	}
 	// start a new node
 	if (cleanChunk.startsWith('<')) {
-		let selfClosing = false;
-		if (cleanChunk.endsWith('/>')) {
-			selfClosing = true;
-			cleanChunk = cleanChunk.replace('<', '').replace('/>', '');
-		} else {
-			cleanChunk = cleanChunk.replace('<', '').replace('>', '');
-		}
-
-		let groups = cleanChunk.match(regex).filter(data => data.length > 1);
-		groups.forEach(group => {
-			if (group.includes('=')) {
-				attributes.push({
-					name: group.split('=')[0],
-					value: group.split('=')[1].replace(/\"/g, '')
-				});
-			} else {
-				name = group;
-			}
-		});
-		node = createXMLNode({
-			type: 'XMLNode',
-			name: normalized(name),
-			value: chunk,
-			selfClosing,
-			attributes,
-			children: []
-		});
-		return node;
+		return parseXMLNormalNode(cleanChunk);
 	}
 };
 
+const parseXMLDefinitionNode = chunk => {
+	let attributes = [];
+	let name = '';
+	cleanChunk = chunk.replace('<?', '').replace('?>', '');
+	// definition node
+	let groups = cleanChunk.match(regex).filter(data => data.length > 1);
+	groups.forEach(group => {
+		if (group.includes('=')) {
+			attributes.push({
+				name: group.split('=')[0],
+				value: group.split('=')[1].replace(/\"/g, '')
+			});
+		} else {
+			name = group;
+		}
+	});
+	return createXMLNode({
+		type: 'XMLDefinition',
+		name: normalized(name),
+		value: chunk,
+		selfClosing: true,
+		attributes,
+		children: []
+	});
+};
+
+const parseXMLNormalNode = chunk => {
+	let attributes = [];
+	let name = '';
+	let selfClosing = false;
+	if (chunk.endsWith('/>')) {
+		selfClosing = true;
+		cleanChunk = chunk.replace('<', '').replace('/>', '');
+	} else {
+		cleanChunk = chunk.replace('<', '').replace('>', '');
+	}
+
+	let groups = cleanChunk.match(regex).filter(data => data.length > 1);
+	groups.forEach(group => {
+		if (group.includes('=')) {
+			attributes.push({
+				name: group.split('=')[0],
+				value: group.split('=')[1].replace(/\"/g, '')
+			});
+		} else {
+			name = group;
+		}
+	});
+	return createXMLNode({
+		type: 'XMLNode',
+		name: normalized(name),
+		value: chunk,
+		selfClosing,
+		attributes,
+		children: []
+	});
+};
 module.exports = { parse };
