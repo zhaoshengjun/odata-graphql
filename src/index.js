@@ -1,8 +1,6 @@
-/**
- * @Input metadata file of odata service
- * @Output graphql schema 
- */
+const readChunk = require('./file').readChunk;
+const xmlFile =  './test/ZCLK_DISABILITY_CIRC_CLUSTER_SRV.xml';
 
- function convert(metaFile) {
-    return metaFile;
- }
+readChunk(xmlFile,{}, chunk => {
+	console.log('[chunk]', chunk);
+});

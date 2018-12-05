@@ -4,9 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "doc":"jsdoc ./src/index.js"
+    "start": "node ./src/index.js",
+    "doc": "jsdoc src -r"
   },
   "devDependencies": {
+    "delimiter-stream": "^2.0.0",
     "jsdoc": "^3.5.5"
-  }
+  },
+  "dependencies": {}
 }
