@@ -2,8 +2,6 @@
 const createXMLNode = require('./xml').createXMLNode;
 
 const normalized = name => name;
-const regex = new RegExp(/(\S*\=\"[^\"]*\")|(\S*)/, 'g');
-
 /**
  *
  * @param {string} chunk - string to parse
@@ -11,8 +9,6 @@ const regex = new RegExp(/(\S*\=\"[^\"]*\")|(\S*)/, 'g');
 const parse = chunk => {
 	// REMEMBER: the chunk always ends with ">"
 	let cleanChunk = chunk.replace(/^\s*|\s*$/g, '').replace(/\s{2,}/g, ' '); // clean space
-	let node;
-	let attributes = [];
 	// definition node
 	if (cleanChunk.startsWith('<?') && cleanChunk.endsWith('?>')) {
 		return parseXMLDefinitionNode(cleanChunk);
@@ -27,12 +23,14 @@ const parse = chunk => {
 	}
 };
 
-const parseXMLDefinitionNode = chunk => {
+const parseXMLNodeBody = chunk => {
+	// either of :
+	// propertyNmae=propertyValue (value can contain space)
+	// propertyName
+	const regex = new RegExp(/(\S*\=\"[^\"]*\")|(\S*)/, 'g');
 	let attributes = [];
 	let name = '';
-	cleanChunk = chunk.replace('<?', '').replace('?>', '');
-	// definition node
-	let groups = cleanChunk.match(regex).filter(data => data.length > 1);
+	let groups = chunk.match(regex).filter(data => data.length > 1);
 	groups.forEach(group => {
 		if (group.includes('=')) {
 			attributes.push({
@@ -43,9 +41,19 @@ const parseXMLDefinitionNode = chunk => {
 			name = group;
 		}
 	});
+	return {
+		name: normalized(name),
+		attributes
+	};
+};
+
+const parseXMLDefinitionNode = chunk => {
+	cleanChunk = chunk.replace('<?', '').replace('?>', '');
+	// definition node
+	const { name, attributes } = parseXMLNodeBody(cleanChunk);
 	return createXMLNode({
 		type: 'XMLDefinition',
-		name: normalized(name),
+		name,
 		value: chunk,
 		selfClosing: true,
 		attributes,
@@ -54,8 +62,6 @@ const parseXMLDefinitionNode = chunk => {
 };
 
 const parseXMLNormalNode = chunk => {
-	let attributes = [];
-	let name = '';
 	let selfClosing = false;
 	if (chunk.endsWith('/>')) {
 		selfClosing = true;
@@ -63,21 +69,10 @@ const parseXMLNormalNode = chunk => {
 	} else {
 		cleanChunk = chunk.replace('<', '').replace('>', '');
 	}
-
-	let groups = cleanChunk.match(regex).filter(data => data.length > 1);
-	groups.forEach(group => {
-		if (group.includes('=')) {
-			attributes.push({
-				name: group.split('=')[0],
-				value: group.split('=')[1].replace(/\"/g, '')
-			});
-		} else {
-			name = group;
-		}
-	});
+	const { name, attributes } = parseXMLNodeBody(cleanChunk);
 	return createXMLNode({
 		type: 'XMLNode',
-		name: normalized(name),
+		name,
 		value: chunk,
 		selfClosing,
 		attributes,
