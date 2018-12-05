@@ -20,4 +20,10 @@ describe('parser', () => {
 			value: 'FromRole_ZDIS_CIRC_CLU_To_M_ZTDL_MED_ASS'
 		});
 	});
+
+	it('should parse self-closing node', () => {
+		const xml = `<Property Name="Key" Type="Edm.Guid" Nullable="false" sap:label="NodeID" />`;
+		let node = parse(xml, root);
+		expect(node.name).toBe('Property');
+	});
 });

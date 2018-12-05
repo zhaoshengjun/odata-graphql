@@ -5,10 +5,9 @@ const normalized = name => name;
 
 /**
  *
- * @param {string} chunk
- * @param {XMLNode} rootNode
+ * @param {string} chunk - string to parse
  */
-const parse = (chunk, rootNode) => {
+const parse = chunk => {
 	// REMEMBER: the chunk always ends with ">"
 	let cleanChunk = chunk.replace(/^\s*|\s*$/g, '').replace(/\s{2,}/g, ' '); // clean space
 	let node;
@@ -32,30 +31,27 @@ const parse = (chunk, rootNode) => {
 			type: 'XMLDefinition',
 			name: normalized(name),
 			value: chunk,
-			parent: rootNode,
+			selfClosing: true,
 			attributes,
 			children: []
 		});
-		rootNode.children.push(node);
-		// no need to push the stack
-		return rootNode;
+		return node;
 	}
 	// close a node
 	if (cleanChunk.startsWith('</')) {
-		// no meaning for creating node for this
-		//  only needs to do error-checking
-		// so just return the parent node (like pop operation)
-		if (rootNode.parent) {
-			return rootNode.parent;
-		} else {
-			return null;
-		}
+		return;
 	}
 	// start a new node
 	if (cleanChunk.startsWith('<')) {
-		cleanChunk = cleanChunk.replace('<', '').replace('>', '');
+		let selfClosing = false;
+		if (cleanChunk.endsWith('/>')) {
+			selfClosing = true;
+			cleanChunk = cleanChunk.replace('<', '').replace('/>', '');
+		} else {
+			cleanChunk = cleanChunk.replace('<', '').replace('>', '');
+		}
 
-		let groups = cleanChunk.split(' ');
+		let groups = cleanChunk.split(' ').filter(data => data.length > 1);
 		groups.forEach(group => {
 			if (group.includes('=')) {
 				attributes.push({
@@ -70,11 +66,10 @@ const parse = (chunk, rootNode) => {
 			type: 'XMLNode',
 			name: normalized(name),
 			value: chunk,
-			parent: rootNode,
+			selfClosing,
 			attributes,
 			children: []
 		});
-		rootNode.children.push(node);
 		return node;
 	}
 };

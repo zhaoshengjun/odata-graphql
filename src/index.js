@@ -16,12 +16,17 @@ let currentNode = xmlFile;
 
 // parse the chunk and generate AST
 readChunk(file, {}, chunk => {
-	// console.log('[chunk]', chunk);
+	console.log('[chunk]', chunk);
 	// 2. parse chunk
-	currentNode = parse(chunk, currentNode);
-	console.log('[current node]', currentNode);
+	let node = parse(chunk);
+	if (node) {
+		console.log('[current node]', node.name);
+		// create relationship
+		currentNode.children.push(node);
+		node.parent = currentNode;
 
-	if (currentNode.type === 'XMLFile') {
-		console.log('[done]', JSON.stringify(currentNode));
+		if (node.type === 'XMLNode' && !node.selfClosing) {
+			currentNode = node;
+		}
 	}
 });
