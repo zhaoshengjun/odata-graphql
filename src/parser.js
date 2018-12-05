@@ -1,15 +1,17 @@
 // parse xml to AST
 const createXMLNode = require('./xml').createXMLNode;
 
+const normalized = name => name;
+
 /**
  *
  * @param {string} chunk
  * @param {XMLNode} rootNode
  */
 const parse = (chunk, rootNode) => {
-	const cleanChunk = chunk.replace(/^\s*|\s*$/g, '').replace(/\s{2,}/g, ' '); // clean space
+	let cleanChunk = chunk.replace(/^\s*|\s*$/g, '').replace(/\s{2,}/g, ' '); // clean space
 	let node;
-	let attributes;
+	let attributes = [];
 	if (cleanChunk.startsWith('<?') && cleanChunk.endsWith('?>')) {
 		cleanChunk = cleanChunk.replace('<?', '').replace('?>', '');
 		// definition node
@@ -18,7 +20,7 @@ const parse = (chunk, rootNode) => {
 			if (group.includes('=')) {
 				attributes.push({
 					name: group.split('=')[0],
-					value: group.split('=')[1]
+					value: group.split('=')[1].replace(/\"/g, '')
 				});
 			} else {
 				name = group;
@@ -35,3 +37,5 @@ const parse = (chunk, rootNode) => {
 	}
 	return node;
 };
+
+module.exports = { parse };
