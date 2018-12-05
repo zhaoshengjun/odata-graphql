@@ -3,6 +3,8 @@ const createXMLNode = require('./xml').createXMLNode;
 
 const normalized = name => name;
 
+const regex = new RegExp(/(\S*\=\"[^\"]*\")|(\S*)/, 'g');
+
 /**
  *
  * @param {string} chunk - string to parse
@@ -16,7 +18,7 @@ const parse = chunk => {
 	if (cleanChunk.startsWith('<?') && cleanChunk.endsWith('?>')) {
 		cleanChunk = cleanChunk.replace('<?', '').replace('?>', '');
 		// definition node
-		let groups = cleanChunk.split(' ');
+		let groups = cleanChunk.match(regex).filter(data => data.length > 1);
 		groups.forEach(group => {
 			if (group.includes('=')) {
 				attributes.push({
@@ -51,7 +53,7 @@ const parse = chunk => {
 			cleanChunk = cleanChunk.replace('<', '').replace('>', '');
 		}
 
-		let groups = cleanChunk.split(' ').filter(data => data.length > 1);
+		let groups = cleanChunk.match(regex).filter(data => data.length > 1);
 		groups.forEach(group => {
 			if (group.includes('=')) {
 				attributes.push({
