@@ -37,7 +37,8 @@ const parse = (chunk, rootNode) => {
 			children: []
 		});
 		rootNode.children.push(node);
-		return node;
+		// no need to push the stack
+		return rootNode;
 	}
 	// close a node
 	if (cleanChunk.startsWith('</')) {
