@@ -15,18 +15,29 @@ let xmlFile = createXMLNode({
 let currentNode = xmlFile;
 
 // parse the chunk and generate AST
-readChunk(file, {}, chunk => {
-	console.log('[chunk]', chunk);
-	// 2. parse chunk
-	let node = parse(chunk);
-	if (node) {
-		console.log('[current node]', node.name);
-		// create relationship
-		currentNode.children.push(node);
-		node.parent = currentNode;
+readChunk(
+	file,
+	{},
+	{
+		onData: chunk => {
+			console.log('[chunk]', chunk);
+			// 2. parse chunk
+			let node = parse(chunk);
+			if (node) {
+				console.log('[current node]-[name]', node.name);
+				console.log('[current node]-[type]', node.type);
+				console.log('[current node]-[attributes]', node.attributes);
+				// create relationship
+				currentNode.children.push(node);
+				node.parent = currentNode;
 
-		if (node.type === 'XMLNode' && !node.selfClosing) {
-			currentNode = node;
+				if (node.type === 'XMLNode' && !node.selfClosing) {
+					currentNode = node;
+				}
+			}
+		},
+		onDone: () => {
+			console.log('done!');
 		}
 	}
-});
+);
