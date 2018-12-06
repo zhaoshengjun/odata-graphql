@@ -36,7 +36,7 @@ readChunk(
 				}
 			}
 		},
-		onDone: () => {
+		onFinish: () => {
 			console.log('done!');
 		}
 	}

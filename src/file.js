@@ -2,7 +2,7 @@ const fs = require('fs');
 // const path = require('path');
 const StringDecoder = require('string_decoder').StringDecoder;
 const DelimiterStream = require('delimiter-stream');
-
+const noop = () => {};
 /**
  *
  * @param {string} filename - file name to parase
@@ -11,7 +11,11 @@ const DelimiterStream = require('delimiter-stream');
  * @param {string} [options.coding='utf8'] - coding
  * @param {function} callback - callback function
  */
-const readChunk = (filename, { delimiter = '>', coding = 'utf8' }, { onData, onDone }) => {
+const readChunk = (
+	filename,
+	{ delimiter = '>', coding = 'utf8' },
+	{ onData, onFinish = noop, onEnd = noop }
+) => {
 	const decoder = new StringDecoder(coding);
 	const delimiterStream = new DelimiterStream({
 		delimiter
@@ -20,12 +24,11 @@ const readChunk = (filename, { delimiter = '>', coding = 'utf8' }, { onData, onD
 		onData(decoder.write(chunk) + delimiter);
 	});
 	delimiterStream.on('finish', _ => {
-		console.log('[stream]-finish');
-		onDone();
+		onFinish();
 	});
 
 	delimiterStream.on('end', _ => {
-		console.log('[stream]-end');
+		onEnd();
 	});
 	const inputStream = fs.createReadStream(filename);
 	inputStream.pipe(delimiterStream);
