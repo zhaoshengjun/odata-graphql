@@ -51,7 +51,7 @@ const parseXMLDefinitionNode = chunk => {
 	cleanChunk = chunk.replace('<?', '').replace('?>', '');
 	// definition node
 	const { name, attributes } = parseXMLNodeBody(cleanChunk);
-	return createXMLNode({
+	const node = createXMLNode({
 		type: 'XMLDefinition',
 		name,
 		value: chunk,
@@ -59,6 +59,7 @@ const parseXMLDefinitionNode = chunk => {
 		attributes,
 		children: []
 	});
+	return node;
 };
 
 const parseXMLNormalNode = chunk => {
@@ -70,7 +71,7 @@ const parseXMLNormalNode = chunk => {
 		cleanChunk = chunk.replace('<', '').replace('>', '');
 	}
 	const { name, attributes } = parseXMLNodeBody(cleanChunk);
-	return createXMLNode({
+	const node = createXMLNode({
 		type: 'XMLNode',
 		name,
 		value: chunk,
@@ -78,5 +79,6 @@ const parseXMLNormalNode = chunk => {
 		attributes,
 		children: []
 	});
+	return node;
 };
 module.exports = { parse };

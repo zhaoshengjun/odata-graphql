@@ -6,6 +6,7 @@
 	"scripts": {
 		"start": "node ./src/index.js",
 		"test": "jest",
+		"debug": "node --inspect-brk=localhost:9229 ./src/index.js",
 		"doc": "jsdoc src -r"
 	},
 	"devDependencies": {
@@ -13,5 +14,7 @@
 		"jest": "^23.6.0",
 		"jsdoc": "^3.5.5"
 	},
-	"dependencies": {}
+	"dependencies": {
+		"rxjs": "^6.3.3"
+	}
 }

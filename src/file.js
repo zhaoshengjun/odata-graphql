@@ -11,11 +11,7 @@ const noop = () => {};
  * @param {string} [options.coding='utf8'] - coding
  * @param {function} callback - callback function
  */
-const readChunk = (
-	filename,
-	{ delimiter = '>', coding = 'utf8' },
-	{ onData, onFinish = noop, onEnd = noop }
-) => {
+const readChunk = (filename, { delimiter = '>', coding = 'utf8' }, onData) => {
 	const decoder = new StringDecoder(coding);
 	const delimiterStream = new DelimiterStream({
 		delimiter
