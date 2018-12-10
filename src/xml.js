@@ -5,16 +5,17 @@ const createXMLNode = ({
 	parent = null,
 	attributes = [],
 	children = [],
-	selfClosing = false
-}) => {
-	this.name = name;
-	this.type = type;
-	this.value = value;
-	this.parent = parent;
-	this.attributes = attributes;
-	this.children = children;
-	this.selfClosing = selfClosing;
-	return this;
-};
+	selfClosing = false,
+	level = 9999
+}) => ({
+	name,
+	type,
+	value,
+	parent,
+	attributes,
+	children,
+	selfClosing,
+	level
+});
 
 module.exports = { createXMLNode };
