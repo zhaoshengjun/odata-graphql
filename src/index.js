@@ -57,8 +57,10 @@ fromStream(newStream)
 		err => console.log(err),
 		() => {
 			// generate AST
-			generateAST(nodes);
+			let ast = generateAST(nodes);
 			// parse AST to generate graphql schema
+			let schema = generateSchema(ast);
+			console.log(schema);
 		}
 	);
 
@@ -85,4 +87,11 @@ const generateAST = nodes => {
 		prevNode = node;
 	}
 	return tree;
+};
+
+// generate graphql Schema
+const generateSchema = ast => {
+	let schema = '';
+
+	return schema;
 };
